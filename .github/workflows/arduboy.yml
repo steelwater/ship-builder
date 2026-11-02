@@ -1,0 +1,43 @@
+name: Arduboy HEX
+
+on:
+  push:
+    branches: ["main", "milestone-*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build 128x64 Arduboy sketch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install AVR core and Arduboy2
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr@1.8.6
+          arduino-cli lib update-index
+          arduino-cli lib install Arduboy2@6.0.0
+
+      - name: Compile and print flash/SRAM report
+        run: |
+          mkdir -p dist
+          arduino-cli compile --fqbn arduino:avr:leonardo --warnings all --output-dir dist src/SSSHBRBSK
+          test -s dist/SSSHBRBSK.ino.hex
+          ls -lh dist
+
+      - name: Publish HEX for simulator review
+        uses: actions/upload-artifact@v4
+        with:
+          name: ssshbrbsk-arduboy-hex
+          path: dist/*.hex
+          if-no-files-found: error
+          retention-days: 30
