@@ -1,0 +1,16 @@
+# Generated Arduino / AVR artifacts
+dist/
+build/
+*.hex
+*.elf
+*.eep
+*.map
+*.o
+*.d
+*.a
+
+# Local IDE and operating system
+.DS_Store
+.vscode/
+.idea/
+*.swp
